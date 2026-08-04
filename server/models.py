@@ -3,7 +3,6 @@ from .config import db, bcrypt
 
 
 class User(db.Model, SerializerMixin):
-
     __tablename__ = "users"
 
     serialize_rules = ("-_password_hash", "-notes.user")
@@ -11,7 +10,7 @@ class User(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
 
     username = db.Column(
-        db.String,
+        db.String(80),
         unique=True,
         nullable=False
     )
@@ -40,7 +39,6 @@ class User(db.Model, SerializerMixin):
 
 
 class Note(db.Model, SerializerMixin):
-
     __tablename__ = "notes"
 
     serialize_rules = ("-user.notes",)
@@ -48,7 +46,7 @@ class Note(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
 
     title = db.Column(
-        db.String,
+        db.String(150),
         nullable=False
     )
 
@@ -70,7 +68,8 @@ class Note(db.Model, SerializerMixin):
 
     user_id = db.Column(
         db.Integer,
-        db.ForeignKey("users.id")
+        db.ForeignKey("users.id"),
+        nullable=False
     )
 
     user = db.relationship(

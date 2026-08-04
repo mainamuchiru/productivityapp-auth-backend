@@ -4,8 +4,8 @@ from .models import User, Note
 
 with app.app_context():
 
-    Note.query.delete()
-    User.query.delete()
+    db.drop_all()
+    db.create_all()
 
     john = User(username="john")
     john.set_password("password123")
@@ -17,28 +17,24 @@ with app.app_context():
     db.session.commit()
 
     notes = [
-
         Note(
             title="Shopping List",
-            content="Milk, Bread, Eggs",
+            content="Milk, Bread",
             user_id=john.id
         ),
-
         Note(
             title="Homework",
             content="Finish Flask project",
             user_id=john.id
         ),
-
         Note(
             title="Workout",
-            content="Gym at 6PM",
+            content="Leg day",
             user_id=mary.id
         ),
-
         Note(
             title="Books",
-            content="Read Atomic Habits",
+            content="Atomic Habits",
             user_id=mary.id
         )
     ]
@@ -46,4 +42,4 @@ with app.app_context():
     db.session.add_all(notes)
     db.session.commit()
 
-    print("Database seeded.")
+    print("Database seeded successfully.")
