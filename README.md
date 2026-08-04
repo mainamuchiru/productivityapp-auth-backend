@@ -2,11 +2,22 @@
 
 ## Project Description
 
-The Productivity App Backend is a Flask REST API that allows users to register, log in, and manage personal notes. The application uses session-based authentication, ensuring that users can only access and modify their own data.
+The Productivity App Backend is a Flask REST API that allows users to register, log in, and manage personal notes. The application uses **session-based authentication**, ensuring that authenticated users can only create, view, update, and delete their own notes.
 
-The backend uses Flask-Bcrypt for password hashing and Flask-Migrate for database migrations.
+The backend uses **Flask-Bcrypt** for secure password hashing and **Flask-Migrate** for database migrations. It is designed to integrate with the provided frontend for the project.
 
-This backend is intended to work with the provided frontend for the project.
+---
+
+## Technologies Used
+
+- Python
+- Flask
+- Flask-SQLAlchemy
+- Flask-Migrate
+- Flask-Bcrypt
+- SQLAlchemy-Serializer
+- SQLite
+- python-dotenv
 
 ---
 
@@ -16,6 +27,7 @@ This backend is intended to work with the provided frontend for the project.
 
 ```bash
 git clone https://github.com/mainamuchiru/productivityapp-auth-backend.git
+
 cd productivityapp-auth-backend
 ```
 
@@ -49,15 +61,35 @@ pip install -r requirements.txt
 
 ---
 
-## 4. Apply database migrations
+## 4. Configure environment variables
 
-If you're cloning the project for the first time, simply run:
+Create a `.env` file inside the `server` directory.
+
+```text
+server/
+└── .env
+```
+
+Add the following environment variables:
+
+```env
+SECRET_KEY=your_secret_key
+DATABASE_URL=sqlite:///app.db
+```
+
+> **Note:** The `.env` file is ignored by Git and should not be committed to the repository.
+
+---
+
+## 5. Apply database migrations
+
+If you're setting up the project for the first time, run:
 
 ```bash
 flask db upgrade
 ```
 
-If you modify the database models later, generate and apply a new migration:
+If you make changes to the database models later, create and apply a new migration:
 
 ```bash
 flask db migrate -m "Describe your changes"
@@ -66,7 +98,7 @@ flask db upgrade
 
 ---
 
-## 5. Seed the database
+## 6. Seed the database
 
 Populate the database with sample users and notes.
 
@@ -96,7 +128,7 @@ http://127.0.0.1:5555
 
 ## POST `/signup`
 
-Registers a new user account.
+Registers a new user.
 
 ### Request Body
 
@@ -107,8 +139,9 @@ Registers a new user account.
 }
 ```
 
-Returns:
-- **201 Created** on success.
+**Response**
+
+- `201 Created`
 
 ---
 
@@ -125,9 +158,10 @@ Authenticates an existing user and creates a session.
 }
 ```
 
-Returns:
-- **200 OK** when login succeeds.
-- **401 Unauthorized** for invalid credentials.
+**Responses**
+
+- `200 OK`
+- `401 Unauthorized`
 
 ---
 
@@ -135,24 +169,26 @@ Returns:
 
 Returns the currently authenticated user.
 
-Returns:
-- **200 OK**
-- **401 Unauthorized** if no active session exists.
+**Responses**
+
+- `200 OK`
+- `401 Unauthorized`
 
 ---
 
 ## DELETE `/logout`
 
-Ends the current user session.
+Logs out the authenticated user.
 
-Returns:
-- **204 No Content**
+**Response**
+
+- `204 No Content`
 
 ---
 
 # Notes Endpoints
 
-> All Notes endpoints require an authenticated user.
+> All Notes endpoints require authentication.
 
 ---
 
@@ -160,25 +196,29 @@ Returns:
 
 Returns all notes belonging to the authenticated user.
 
+Supports pagination.
+
 Example:
 
 ```
 GET /notes?page=1
 ```
 
-Returns:
-- **200 OK**
+**Response**
+
+- `200 OK`
 
 ---
 
 ## GET `/notes/<id>`
 
-Returns a specific note belonging to the authenticated user.
+Returns a specific note owned by the authenticated user.
 
-Returns:
-- **200 OK**
-- **401 Unauthorized**
-- **404 Not Found**
+**Responses**
+
+- `200 OK`
+- `401 Unauthorized`
+- `404 Not Found`
 
 ---
 
@@ -195,8 +235,9 @@ Creates a new note.
 }
 ```
 
-Returns:
-- **201 Created**
+**Response**
+
+- `201 Created`
 
 ---
 
@@ -212,17 +253,19 @@ Updates an existing note.
 }
 ```
 
-Returns:
-- **200 OK**
+**Response**
+
+- `200 OK`
 
 ---
 
 ## DELETE `/notes/<id>`
 
-Deletes a note belonging to the authenticated user.
+Deletes a note owned by the authenticated user.
 
-Returns:
-- **204 No Content**
+**Response**
+
+- `204 No Content`
 
 ---
 
@@ -230,15 +273,17 @@ Returns:
 
 ## User
 
-Stores user authentication information.
+Stores authentication information.
 
 ### Fields
+
 - id
 - username
 - password_hash
 
-### Relationships
-- One User has many Notes.
+### Relationship
+
+A User can have many Notes.
 
 ---
 
@@ -247,6 +292,7 @@ Stores user authentication information.
 Stores notes created by authenticated users.
 
 ### Fields
+
 - id
 - title
 - content
@@ -258,15 +304,16 @@ Stores notes created by authenticated users.
 
 # Features
 
-- User registration and login
+- User registration
+- User login and logout
 - Session-based authentication
 - Secure password hashing with Flask-Bcrypt
-- CRUD operations for notes
+- Full CRUD operations for notes
 - Pagination for notes
 - Protected routes
 - User-specific authorization
 - Database migrations with Flask-Migrate
-- Seed data for testing
+- Seed script with sample data
 
 ---
 
@@ -278,17 +325,20 @@ productivityapp-auth-backend/
 ├── migrations/
 │
 ├── server/
+│   ├── .env.example
 │   ├── __init__.py
 │   ├── app.py
 │   ├── auth.py
 │   ├── config.py
 │   ├── models.py
 │   ├── routes.py
-│   └── seed.py
+│   ├── seed.py
+│   └── ...
 │
 ├── run.py
 ├── requirements.txt
-└── README.md
+├── README.md
+└── .gitignore
 ```
 
 ---
@@ -297,20 +347,21 @@ productivityapp-auth-backend/
 
 The API can be tested using **Postman**.
 
-Recommended authentication flow:
+Suggested testing flow:
 
-1. Register a user using `/signup`
-2. Log in using `/login`
-3. Verify the session with `/me`
-4. Create notes using `/notes`
-5. Retrieve notes using `/notes?page=1`
-6. Update and delete notes
-7. Log out using `/logout`
-8. Verify protected routes return **401 Unauthorized** after logout
+1. Register a user using `POST /signup`
+2. Log in using `POST /login`
+3. Verify authentication with `GET /me`
+4. Create a note using `POST /notes`
+5. Retrieve notes using `GET /notes?page=1`
+6. Update a note using `PATCH /notes/<id>`
+7. Delete a note using `DELETE /notes/<id>`
+8. Log out using `DELETE /logout`
+9. Verify protected routes return `401 Unauthorized` after logout
+10. Confirm one user cannot access another user's notes
 
 ---
 
 # Author
 
 **Philip Muchiru**
-```
