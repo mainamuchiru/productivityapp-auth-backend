@@ -1,15 +1,36 @@
 from flask import Flask
-from .config import db, bcrypt, migrate
+
+from .config import (
+    db,
+    bcrypt,
+    migrate,
+    SECRET_KEY,
+    DATABASE_URL,
+)
+
 from .routes import register_routes
 
-app = Flask(__name__)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SECRET_KEY"] = "change-this-secret-key"
+def create_app():
+    app = Flask(__name__)
 
-db.init_app(app)
-bcrypt.init_app(app)
-migrate.init_app(app, db)
+    app.config["SECRET_KEY"] = SECRET_KEY
+    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-register_routes(app)
+    db.init_app(app)
+    bcrypt.init_app(app)
+    migrate.init_app(app, db)
+
+    register_routes(app)
+
+    @app.get("/")
+    def home():
+        return {
+            "message": "Welcome to the Productivity App Backend API"
+        }, 200
+
+    return app
+
+
+app = create_app()
